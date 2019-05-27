@@ -8,3 +8,4 @@ RUN apt-get -y update &&\
       libpq-dev \
       && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 ENV LANG C.UTF-8
+ENV PYTHONUNBUFFERED 1
