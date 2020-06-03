@@ -1,0 +1,18 @@
+build:
+  stage: build
+  tags:
+  - docker-unprivileged
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables: # note: cannot use variables inside other variables, except if they are pre-defined (by runner / secret)
+    CONTAINER_IMAGE_RELEASE: $N49REGISTRY/pytexcv/pytexcv:latest
+    CONTAINER_IMAGE_COMMIT:  $N49REGISTRY/pytexcv/pytexcv:build-$CI_COMMIT_SHA
+  script:
+    - echo "{\"auths\":{\"$N49REGISTRY\":{\"username\":\"$N49REGISTRY_USER\",\"password\":\"$N49REGISTRY_PW\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --context $CI_PROJECT_DIR
+        --dockerfile $CI_PROJECT_DIR/Dockerfile
+        --destination $CONTAINER_IMAGE_COMMIT
+        $(if [ "$CI_COMMIT_BRANCH" = "master" ]; then echo "--destination $CONTAINER_IMAGE_RELEASE" ; fi)
+
